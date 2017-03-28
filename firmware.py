@@ -142,7 +142,7 @@ def upload(ip, port, user, passwd, source, destination = '/tmp/fw.bin', upgrade 
 
 
         if upgrade:
-            CMD = "sh -c '/sbin/sysupgrade -c /tmp/fw.bin > /dev/null 2>&1 &'"
+            CMD = "sh -c '/sbin/sysupgrade /tmp/fw.bin > /dev/null 2>&1 &'"
             stdin, stdout, stderr = con.exec_command(CMD)
             #print(stdout.readlines())
 
@@ -186,8 +186,9 @@ def job(d):
     # Download firmware
     file_name = '/tmp/'+d+'_'+device+'.bin'
     url = newest[1]
-    f=open(file_name, "wb")                                                                                                                                                               
+    f=open(file_name, "wb")
     f.write(get_resource(url, wusername, wpassword)) 
+    f.close()
 
     # Upload firmware
     if not upload(ip, port, username, password, file_name, upgrade = True):
@@ -216,7 +217,7 @@ with ThreadPoolExecutor(max_workers=3) as executor:
 
     result = []
     jobs = []
-    for d in ['td','gd1', 'gd2']:
+    for d in ['td']:
         jobs.append(executor.submit(job, d))
 
     for future in future_completed(jobs):
